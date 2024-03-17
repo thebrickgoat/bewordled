@@ -7,9 +7,12 @@
       </ul>
       <h3>Local</h3>
       <ul>
-        <li v-for="(score, index) in highScores" :key="score.id">{{ index + 1 }} : {{ score }}</li>
+        <li v-for="(score, index) in highScores" :key="score.id">
+          <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
+        </li>
       </ul>
     </div>
+    <button @click="clearScores">Clear Scores</button>
   </div>
 </template>
 
@@ -29,10 +32,22 @@ const getScores = () => {
   console.log(scores)
   return scores
 }
+const clearScores = () => {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key.includes('bewordled')) {
+      localStorage.removeItem(key)
+    }
+  }
+}
+
 const highScores = ref(getScores())
 </script>
 
 <style scoped>
+.score-container {
+  margin-bottom: 1rem;
+}
 ul {
   list-style: none;
   padding: 0;

@@ -4,27 +4,25 @@ import HighScores from './components/HighScores.vue'
 </script>
 
 <template>
-  <div id="app">
-    <header>
-      <div>
-        <h1>bewordled</h1>
-        <p>wordle and bejeweled put together. whats not to love?</p>
-      </div>
-    </header>
-    <main>
-      <div>
-        <GameContainer />
-      </div>
-      <div>
-        <HighScores />
-      </div>
-    </main>
-    <footer>
-      <div>
-        <p>Created by <a href="https://thebrickgoat.com">thebrickgoat.com</a></p>
-      </div>
-    </footer>
-  </div>
+  <header>
+    <div>
+      <h1>bewordled</h1>
+      <p>wordle and bejeweled put together. whats not to love?</p>
+    </div>
+  </header>
+  <main>
+    <div>
+      <GameContainer />
+    </div>
+    <div>
+      <HighScores />
+    </div>
+  </main>
+  <footer>
+    <div>
+      <p>Created by <a href="https://thebrickgoat.com">thebrickgoat.com</a></p>
+    </div>
+  </footer>
 </template>
 
 <style scoped>
@@ -35,6 +33,7 @@ h1 {
   font-weight: 900;
   color: var(--color-accent);
 }
+
 h2 {
 }
 </style>

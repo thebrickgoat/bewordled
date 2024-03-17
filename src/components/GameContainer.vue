@@ -20,9 +20,6 @@
           :key="`cell-${cellIndex}`"
           class="game-cell"
           :class="{ selected: cell.selected, matched: cell.matched, fell: cell.fell }"
-          :style="{
-            backgroundColor: cell.selected ? 'red' : cell.matched ? 'green' : 'transparent'
-          }"
           @click="() => handleCellClick(rowIndex, cellIndex)"
         >
           {{ cell.letter }}
@@ -34,7 +31,7 @@
         class="game-cell"
         v-for="(letter, index) in secretWord"
         :key="`letter-${index}`"
-        :style="{ backgroundColor: letter && currentLetters.includes(letter) ? 'green' : '' }"
+        :class="{ matched: currentLetters.includes(letter) }"
       >
         <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
       </div>
@@ -54,7 +51,7 @@ const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
 const moves = ref(0)
-const movesLimit = 2
+const movesLimit = 1
 const gameState = ref('playing')
 const lastWord = ref('')
 const delayAmount = 1500
@@ -237,6 +234,7 @@ const gameIsOver = () => {
 }
 
 const resetGame = () => {
+  gameState.value = 'playing'
   score.value = 0
   moves.value = 0
   initBoard()
@@ -281,6 +279,14 @@ onMounted(initBoard)
   align-items: center;
   transition: background-color 0.3s ease;
   position: relative;
+}
+.game-cell.selected {
+  color: white;
+  background-color: red;
+}
+.game-cell.matched {
+  color: white;
+  background-color: var(--color-accent);
 }
 .letter-board .game-cell {
   transform: translateY(-40px);
