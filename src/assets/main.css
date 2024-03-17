@@ -1,0 +1,40 @@
+@import './base.css';
+
+#app {
+  margin: 0 auto;
+  font-weight: normal;
+  width: 100%;
+  padding: 2rem;
+  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: var(--color-accent);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+  #app {
+    flex-direction: column;
+    padding: 4rem;
+  }
+  main {
+    display: flex;
+    gap: 2rem;
+  }
+}
