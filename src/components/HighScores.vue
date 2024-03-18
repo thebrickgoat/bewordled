@@ -1,14 +1,10 @@
 <template>
   <div>
     <div class="score-container">
-      <h3>Global</h3>
-      <ul>
-        <li>error fetching scores</li>
-      </ul>
       <h3>Local</h3>
       <template v-if="localHighScores.length > 0">
         <ul>
-          <li v-for="(score, index) in highScores" :key="score.id">
+          <li v-for="(score, index) in localHighScores" :key="score.id">
             <template v-if="index <= 4">
               <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
             </template>
@@ -37,8 +33,10 @@ const getScores = () => {
       scores.push(Number(score)) // Convert score to a number
     }
   }
+  console.log(scores)
   scores.sort((a, b) => b - a)
   localHighScores.value = scores
+  console.log(localHighScores.value)
 }
 
 const clearScores = () => {
