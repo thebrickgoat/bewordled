@@ -8,7 +8,9 @@
       <h3>Local</h3>
       <ul>
         <li v-for="(score, index) in highScores" :key="score.id">
-          <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
+          <template v-if="index <= 4">
+            <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
+          </template>
         </li>
       </ul>
     </div>
@@ -29,7 +31,6 @@ const getScores = () => {
     }
   }
   scores.sort((a, b) => b - a)
-  console.log(scores)
   return scores
 }
 const clearScores = () => {

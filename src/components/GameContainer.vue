@@ -38,6 +38,13 @@
       <div class="score-multiplier">x {{ scoreMultiplier }}</div>
     </div>
   </div>
+  <div v-if="showDebug" class="debug">
+    <pre>debug window</pre>
+    <pre>lastWord: {{ lastWord }}</pre>
+    <pre>secret-word: {{ secretWord }}</pre>
+    <pre>curentLetters: {{ currentLetters }}</pre>
+    <pre>gotWords: {{ gotWords }}</pre>
+  </div>
 </template>
 
 <script setup>
@@ -51,7 +58,7 @@ const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
 const moves = ref(0)
-const movesLimit = 1
+const movesLimit = 5
 const gameState = ref('playing')
 const lastWord = ref('')
 const delayAmount = 1500
@@ -60,6 +67,8 @@ const scoreMultiplier = ref(10)
 const scoreMultiplierLimit = 100
 const scoreMultiplierIncrement = 10
 const canClick = ref(true)
+const gotWords = ref([])
+const showDebug = ref(false)
 
 const initBoard = () => {
   getSecretWord()
@@ -73,6 +82,11 @@ const initBoard = () => {
   }
   updateCellStatus()
 }
+
+const showDebugWindow = () => {
+  showDebug.value = !showDebug.value
+}
+
 const boardHasVowel = () => {
   return board.value.some((row) => row.some((cell) => vowels.includes(cell.letterf)))
 }
@@ -87,9 +101,8 @@ const createCell = (matched = false, fell = false) => {
 
 const ensureVowelSpawn = () => {
   if (!boardHasVowel()) {
-    const randomRow = Math.floor(Math.random() * boardSize)
     const randomCol = Math.floor(Math.random() * boardSize)
-    board.value[randomRow][randomCol] = createVowelCell()
+    board.value[0][randomCol] = createVowelCell()
   }
 }
 
@@ -104,6 +117,7 @@ const areCellsAdjacent = (row1, col1, row2, col2) => {
 
 const handleCellClick = async (rowIndex, cellIndex) => {
   if (!canClick.value) return
+  console.log('click')
   const selectedCell = board.value.flat().find((cell) => cell.selected)
   if (selectedCell) {
     if (areCellsAdjacent(rowIndex, cellIndex, selectedCell.row, selectedCell.column)) {
@@ -128,31 +142,44 @@ const handleCellClick = async (rowIndex, cellIndex) => {
 const checkForMatches = () => {
   let matchFound = false
   let matchLength = 0
-
+  console.log('checking for matches')
   // Check horizontal matches
+
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize - 2; j++) {
       const word =
         board.value[i][j].letter + board.value[i][j + 1].letter + board.value[i][j + 2].letter
       if (wordlist.includes(word)) {
-        board.value[i][j].matched =
-          board.value[i][j + 1].matched =
-          board.value[i][j + 2].matched =
-            true
-        matchFound = true
-        matchLength = 3
+        // Check if the word contains a shorter word
+        let containsShorterWord = false
+        for (let k = 0; k < boardSize - 2; k++) {
+          if (
+            k !== j &&
+            wordlist.includes(board.value[i][k].letter + board.value[i][k + 1].letter)
+          ) {
+            containsShorterWord = true
+            break
+          }
+        }
+        if (!containsShorterWord) {
+          //update score and word to found words list
+          console.log('match found', word)
+          board.value[i][j].matched =
+            board.value[i][j + 1].matched =
+            board.value[i][j + 2].matched =
+              true
+          matchLength = word.length
+          score.value += matchLength
+          console.log('added to score', matchLength)
+          lastWord.value = word
+          gotWords.value.push(word)
+          matchFound = true
+        }
       }
     }
   }
+  // remove matches and check if moves are out
   if (matchFound) {
-    // Update score and remove matched cells
-    lastWord.value = board.value
-      .flat()
-      .filter((cell) => cell.matched)
-      .map((cell) => cell.letter)
-      .join('')
-    score.value += 10 * matchLength
-
     removeMatches()
   } else if (moves.value >= movesLimit) {
     gameIsOver()
@@ -161,9 +188,8 @@ const checkForMatches = () => {
 
 const removeMatches = () => {
   canClick.value = false
-  ensureVowelSpawn() // Make sure there's at least one vowel on the board
   // Introduce a small delay before clearing matches and refilling
-
+  console.log('removing matches')
   setTimeout(() => {
     for (let i = 0; i < boardSize; i++) {
       for (let j = 0; j < boardSize; j++) {
@@ -197,9 +223,9 @@ const updateCellStatus = () => {
 
 const getSecretWord = async () => {
   currentLetters.value = []
-  const response = await fetch('https://random-word.ryanrk.com/api/en/word/random/?length=5')
+  const response = await fetch('https://random-word-api.herokuapp.com/word?lang=es&length=5')
   const data = await response.json()
-  secretWord.value = data[0]
+  secretWord.value = data[0].toLowerCase()
 }
 
 const checkSecretWord = () => {
@@ -229,14 +255,17 @@ const gameIsOver = () => {
   console.log('game over')
   let key = `bewordled-high-score-${new Date().toISOString()}`
   localStorage.setItem(key, score.value)
-
+  canClick.value = false
   gameState.value = 'over'
 }
 
 const resetGame = () => {
   gameState.value = 'playing'
+  canClick.value = true
+  gotWords.value = []
   score.value = 0
   moves.value = 0
+  scoreMultiplier.value = 10
   initBoard()
 }
 

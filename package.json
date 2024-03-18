@@ -7,11 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "make-word-list": "node scripts/make-word-list.cjs",
+    "make-word-list": "node scripts/make-word-list.js",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore ",
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "popular-english-words": "^1.0.2",
     "vue": "^3.4.21",
     "word-list": "^3.1.0"
   },
