@@ -21,7 +21,8 @@ main {
   -webkit-box-shadow: 0px 8px 30px -9px rgba(0, 0, 0, 0.48);
   -moz-box-shadow: 0px 8px 30px -9px rgba(0, 0, 0, 0.48);
   background-color: var(--color-background);
-  width: fit-content;
+  max-width: min-content;
+  width: 100%;
   margin: auto;
 }
 
@@ -61,6 +62,9 @@ button {
   .half{
     max-width: 50%;
   
+  }
+  main{
+    max-width: 695px;
   }
   #app {
     padding: 0;

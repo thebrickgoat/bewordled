@@ -51,7 +51,7 @@ const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
 const moves = ref(0)
-const movesLimit = 50
+const movesLimit = 2
 const gameState = ref('playing')
 const lastWord = ref('')
 const delayAmount = 1500
@@ -251,18 +251,7 @@ const increaseScore = (x) => {
 
 const gameIsOver = () => {
   const newKey = `bewordled-high-score-${new Date().toISOString()}`
-  if (localStorage.length >= 5) {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key.includes('bewordled')) {
-        score.value > Number(localStorage.getItem(key))
-          ? localStorage.removeItem(key) && localStorage.setItem(newKey, score.value)
-          : null
-        return
-      }
-    }
-  }
-
+  localStorage.setItem(newKey, score.value)
   canClick.value = false
   gameState.value = 'over'
 }
