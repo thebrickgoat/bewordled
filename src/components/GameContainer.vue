@@ -53,7 +53,7 @@ import { ref, onMounted, nextTick } from 'vue'
 
 const boardSize = 6
 const letters = ref([])
-// const vowels = ['a', 'e', 'i', 'o', 'u']
+const vowels = ['a', 'e', 'i', 'o', 'u']
 const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
@@ -74,7 +74,6 @@ const showPointsDialog = ref(false)
 
 const initBoard = () => {
   getSecretWord()
-
   letters.value = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))
   for (let i = 0; i < boardSize; i++) {
     board.value[i] = []
@@ -93,13 +92,13 @@ const createCell = (matched = false, fell = false) => {
   }
 }
 
-/*
 const boardHasVowel = () => {
-  return board.value.some((row) => row.some((cell) => vowels.includes(cell.letterf)))
+  return board.value.some((row) => row.some((cell) => vowels.includes(cell.letter)))
 }
 
 const ensureVowelSpawn = () => {
   if (!boardHasVowel()) {
+    console.log('spawning vowel')
     const randomCol = Math.floor(Math.random() * boardSize)
     board.value[0][randomCol] = createVowelCell()
   }
@@ -109,7 +108,6 @@ const createVowelCell = () => {
   const randomVowel = vowels[Math.floor(Math.random() * vowels.length)]
   return { letter: randomVowel, matched: false, fell: true }
 }
-*/
 
 const areCellsAdjacent = (row1, col1, row2, col2) => {
   return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1
@@ -202,6 +200,7 @@ const removeMatches = (points) => {
 
     // Call this function at the end of your removeMatches method, possibly with a delay if needed
     setTimeout(() => {
+      ensureVowelSpawn()
       updateCellStatus()
     }, 100) // Adjust the timing as needed based on your animation
   }, delayAmount) // 500ms delay

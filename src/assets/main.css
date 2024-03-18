@@ -24,10 +24,7 @@ main {
   width: fit-content;
   margin: auto;
 }
-.half{
-  max-width: 50%;
 
-}
 a,
 .green {
   text-decoration: none;
@@ -61,7 +58,10 @@ button {
     display: flex;
     place-items: center;
   }
-
+  .half{
+    max-width: 50%;
+  
+  }
   #app {
     padding: 0;
     margin: auto;
