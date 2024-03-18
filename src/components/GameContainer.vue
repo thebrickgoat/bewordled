@@ -21,7 +21,7 @@
       </div>
       <div class="secret-word">
         <div class="game-cell" v-for="(letter, index) in secretWord" :key="`letter-${index}`"
-          :class="{ matched: currentLetters.includes(letter) }">
+          :class="{ matched: currentLetters.includes(letter), solved: currentLetters.length >= 5 }">
           <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
         </div>
         <div class="score-multiplier">x {{ scoreMultiplier }}</div>
@@ -37,13 +37,6 @@
     <h2>Game Over</h2>
     <p>you score was {{ score }}</p>
     <button @click="resetGame">Play Again</button>
-  </div>
-  <div v-if="showDebug" class="debug">
-    <pre>debug window</pre>
-    <pre>lastWord: {{ lastWord }}</pre>
-    <pre>secret-word: {{ secretWord }}</pre>
-    <pre>curentLetters: {{ currentLetters }}</pre>
-    <pre>gotWords: {{ gotWords }}</pre>
   </div>
 </template>
 
@@ -68,7 +61,6 @@ const scoreMultiplierLimit = 100
 const scoreMultiplierIncrement = 10
 const canClick = ref(true)
 const gotWords = ref([])
-const showDebug = ref(false)
 const pointsDialog = ref(0)
 const showPointsDialog = ref(false)
 
@@ -127,7 +119,6 @@ const handleCellClick = async (rowIndex, cellIndex) => {
       board.value[selectedCell.row][selectedCell.column].letter = tempLetter
       await nextTick()
       checkForMatches()
-      checkSecretWord()
     }
     board.value[selectedCell.row][selectedCell.column].selected = false
   } else {
@@ -173,6 +164,7 @@ const checkForMatches = () => {
 
   if (matchFound) {
     removeMatches(points)
+    checkSecretWord()
   } else if (moves.value >= movesLimit) {
     gameIsOver()
   }
@@ -232,13 +224,13 @@ const checkSecretWord = () => {
 
   if (secretLetters.every((letter) => currentLetters.value.includes(letter))) {
     canClick.value = false
-    currentLetters.value = []
     increaseScore(scoreMultiplier.value)
     scoreMultiplier.value != scoreMultiplierLimit
       ? (scoreMultiplier.value += scoreMultiplierIncrement)
       : scoreMultiplierLimit
     setTimeout(() => {
       canClick.value = true;
+      currentLetters.value = []
       getSecretWord()
     }, delayAmount);
   } else {
@@ -449,7 +441,17 @@ onMounted(initBoard)
     transform: translateY(0);
   }
 }
-
+@keyframes blink {
+  0% {
+    opacity: .5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .5;
+  }
+}
 .fade-slide-out {
   margin-left: 0.25rem;
   position: absolute;
@@ -460,6 +462,9 @@ onMounted(initBoard)
   animation: fade-in 1s ease forwards;
 }
 
+.solved{
+  animation: blink .5s ease forwards infinite;
+}
 .hidden {
   display: none;
 }

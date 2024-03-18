@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="score-container">
-      <h3>Local</h3>
+      <h3>Local Scores</h3>
       <template v-if="localHighScores.length > 0">
         <ul>
           <li v-for="(score, index) in localHighScores" :key="score.id">
             <template v-if="index <= 4">
-              <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
+              <span>{{ index + 1 }}</span> : <span class="accent">{{ score }}</span>
             </template>
           </li>
         </ul>
