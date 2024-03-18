@@ -53,7 +53,7 @@ import { ref, onMounted, nextTick } from 'vue'
 
 const boardSize = 6
 const letters = ref([])
-const vowels = ['a', 'e', 'i', 'o', 'u']
+// const vowels = ['a', 'e', 'i', 'o', 'u']
 const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
@@ -83,20 +83,18 @@ const initBoard = () => {
   updateCellStatus()
 }
 
-const showDebugWindow = () => {
-  showDebug.value = !showDebug.value
-}
-
-const boardHasVowel = () => {
-  return board.value.some((row) => row.some((cell) => vowels.includes(cell.letterf)))
-}
-
 const createCell = (matched = false, fell = false) => {
   return {
     letter: letters.value[Math.floor(Math.random() * letters.value.length)],
     matched,
     fell
   }
+}
+
+/*
+
+const boardHasVowel = () => {
+  return board.value.some((row) => row.some((cell) => vowels.includes(cell.letterf)))
 }
 
 const ensureVowelSpawn = () => {
@@ -110,6 +108,7 @@ const createVowelCell = () => {
   const randomVowel = vowels[Math.floor(Math.random() * vowels.length)]
   return { letter: randomVowel, matched: false, fell: true }
 }
+*/
 
 const areCellsAdjacent = (row1, col1, row2, col2) => {
   return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1
