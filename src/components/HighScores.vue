@@ -6,20 +6,27 @@
         <li>error fetching scores</li>
       </ul>
       <h3>Local</h3>
-      <ul>
-        <li v-for="(score, index) in highScores" :key="score.id">
-          <template v-if="index <= 4">
-            <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
-          </template>
-        </li>
-      </ul>
+      <template v-if="localHighScores.length > 0">
+        <ul>
+          <li v-for="(score, index) in highScores" :key="score.id">
+            <template v-if="index <= 4">
+              <span>{{ index + 1 }}</span> : <span>{{ score }}</span>
+            </template>
+          </li>
+        </ul>
+        <button @click="clearScores">Clear Scores</button>
+      </template>
+      <template v-else>
+        <p>no scores yet!</p>
+      </template>
     </div>
-    <button @click="clearScores">Clear Scores</button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+
+const localHighScores = ref([])
 
 const getScores = () => {
   const scores = []
@@ -31,9 +38,11 @@ const getScores = () => {
     }
   }
   scores.sort((a, b) => b - a)
-  return scores
+  localHighScores.value = scores
 }
+
 const clearScores = () => {
+  localHighScores.value = []
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
     if (key.includes('bewordled')) {
@@ -42,7 +51,9 @@ const clearScores = () => {
   }
 }
 
-const highScores = ref(getScores())
+onMounted(() => {
+  getScores()
+})
 </script>
 
 <style scoped>
@@ -68,5 +79,8 @@ h3 {
   text-transform: uppercase;
   padding-bottom: 0.25rem;
   color: var(--color-accent);
+}
+p {
+  margin-top: 0.5rem;
 }
 </style>

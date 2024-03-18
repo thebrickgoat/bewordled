@@ -2,6 +2,7 @@
   <div v-if="gameState === 'playing'">
     <div>
       Score: <span class="accent">{{ score }}</span>
+      <span :class="showPointsDialog ? 'fade-slide-out' : 'hidden'"> + {{ pointsDialog }}</span>
     </div>
     <div>
       Moves: <span class="accent">{{ moves }} / {{ movesLimit }}</span>
@@ -51,14 +52,14 @@
 import { wordlist } from '@/assets/words'
 import { ref, onMounted, nextTick } from 'vue'
 
-const boardSize = 6
+const boardSize = 8
 const letters = ref([])
 // const vowels = ['a', 'e', 'i', 'o', 'u']
 const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
 const moves = ref(0)
-const movesLimit = 5
+const movesLimit = 50
 const gameState = ref('playing')
 const lastWord = ref('')
 const delayAmount = 1500
@@ -68,7 +69,9 @@ const scoreMultiplierLimit = 100
 const scoreMultiplierIncrement = 10
 const canClick = ref(true)
 const gotWords = ref([])
-const showDebug = ref(false)
+const showDebug = ref(true)
+const pointsDialog = ref(0)
+const showPointsDialog = ref(false)
 
 const initBoard = () => {
   getSecretWord()
@@ -92,7 +95,6 @@ const createCell = (matched = false, fell = false) => {
 }
 
 /*
-
 const boardHasVowel = () => {
   return board.value.some((row) => row.some((cell) => vowels.includes(cell.letterf)))
 }
@@ -140,55 +142,49 @@ const handleCellClick = async (rowIndex, cellIndex) => {
 
 const checkForMatches = () => {
   let matchFound = false
-  let matchLength = 0
-  console.log('checking for matches')
-  // Check horizontal matches
-
+  let points = 0
+  // Check horizontal matches for 3 to 5-letter words
   for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize - 2; j++) {
-      const word =
-        board.value[i][j].letter + board.value[i][j + 1].letter + board.value[i][j + 2].letter
-      if (wordlist.includes(word)) {
-        // Check if the word contains a shorter word
-        let containsShorterWord = false
-        for (let k = 0; k < boardSize - 2; k++) {
-          if (
-            k !== j &&
-            wordlist.includes(board.value[i][k].letter + board.value[i][k + 1].letter)
-          ) {
-            containsShorterWord = true
+    for (let j = 0; j < boardSize; j++) {
+      // Start checking from the first column
+      for (let wordLength = 3; wordLength <= 5; wordLength++) {
+        // Check for word lengths from 3 to 5
+        if (j + wordLength <= boardSize) {
+          // Ensure the word doesn't go beyond the board
+          const word = board.value[i]
+            .slice(j, j + wordLength)
+            .map((cell) => cell.letter)
+            .join('')
+          if (wordlist.includes(word)) {
+            // Found a valid word, mark cells as matched
+            for (let k = 0; k < wordLength; k++) {
+              board.value[i][j + k].matched = true
+            }
+            lastWord.value = word // Update the last found word
+            if (!gotWords.value.includes(word)) {
+              gotWords.value.push(word) // Add new word to the found words list
+            }
+            matchFound = true
+            points += wordLength
+            // Break after finding the longest word starting from this cell
             break
           }
-        }
-        if (!containsShorterWord) {
-          //update score and word to found words list
-          console.log('match found', word)
-          board.value[i][j].matched =
-            board.value[i][j + 1].matched =
-            board.value[i][j + 2].matched =
-              true
-          matchLength = word.length
-          score.value += matchLength
-          console.log('added to score', matchLength)
-          lastWord.value = word
-          gotWords.value.push(word)
-          matchFound = true
         }
       }
     }
   }
-  // remove matches and check if moves are out
+
   if (matchFound) {
-    removeMatches()
+    removeMatches(points)
   } else if (moves.value >= movesLimit) {
     gameIsOver()
   }
 }
 
-const removeMatches = () => {
+const removeMatches = (points) => {
   canClick.value = false
+  increaseScore(points)
   // Introduce a small delay before clearing matches and refilling
-  console.log('removing matches')
   setTimeout(() => {
     for (let i = 0; i < boardSize; i++) {
       for (let j = 0; j < boardSize; j++) {
@@ -221,10 +217,8 @@ const updateCellStatus = () => {
 }
 
 const getSecretWord = async () => {
-  currentLetters.value = []
-  const response = await fetch('https://random-word-api.herokuapp.com/word?lang=es&length=5')
-  const data = await response.json()
-  secretWord.value = data[0].toLowerCase()
+  const secretWords = wordlist.filter((word) => word.length == 5)
+  secretWord.value = secretWords[Math.floor(Math.random() * secretWords.length)]
 }
 
 const checkSecretWord = () => {
@@ -239,19 +233,31 @@ const checkSecretWord = () => {
   }
 
   if (secretLetters.every((letter) => currentLetters.value.includes(letter))) {
-    score.value = score.value + 10 * scoreMultiplier.value
+    currentLetters.value = []
+    increaseScore(scoreMultiplier.value)
     scoreMultiplier.value != scoreMultiplierLimit
       ? (scoreMultiplier.value += scoreMultiplierIncrement)
       : scoreMultiplierLimit
-    getSecretWord()
+    setTimeout(() => {
+      getSecretWord()
+    }, delayAmount)
   } else {
     if (scoreMultiplier.value > 1) {
       scoreMultiplier.value -= 1
     }
   }
 }
+
+const increaseScore = (x) => {
+  pointsDialog.value = 1 * x
+  showPointsDialog.value = true
+  score.value += 1 * x
+  setTimeout(() => {
+    showPointsDialog.value = false
+  }, 1000)
+}
+
 const gameIsOver = () => {
-  console.log('game over')
   let key = `bewordled-high-score-${new Date().toISOString()}`
   localStorage.setItem(key, score.value)
   canClick.value = false
@@ -260,6 +266,7 @@ const gameIsOver = () => {
 
 const resetGame = () => {
   gameState.value = 'playing'
+  currentLetters.value = []
   canClick.value = true
   gotWords.value = []
   score.value = 0
@@ -307,6 +314,7 @@ onMounted(initBoard)
   align-items: center;
   transition: background-color 0.3s ease;
   position: relative;
+  font-weight: 900;
 }
 .game-cell.selected {
   color: white;
@@ -343,5 +351,33 @@ onMounted(initBoard)
 .accent {
   color: var(--color-accent);
   font-weight: 900;
+}
+
+@keyframes fadeSlideOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.fade-slide-out {
+  margin-left: 0.25rem;
+  position: absolute;
+  animation: fadeSlideOut 1s ease forwards;
+}
+.hidden {
+  display: none;
 }
 </style>
