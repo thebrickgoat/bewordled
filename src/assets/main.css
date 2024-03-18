@@ -21,8 +21,13 @@ main {
   -webkit-box-shadow: 0px 8px 30px -9px rgba(0, 0, 0, 0.48);
   -moz-box-shadow: 0px 8px 30px -9px rgba(0, 0, 0, 0.48);
   background-color: var(--color-background);
+  width: fit-content;
+  margin: auto;
 }
+.half{
+  max-width: 50%;
 
+}
 a,
 .green {
   text-decoration: none;

@@ -1,43 +1,42 @@
 <template>
-  <div v-if="gameState === 'playing'">
-    <div>
-      Score: <span class="accent">{{ score }}</span>
-      <span :class="showPointsDialog ? 'fade-slide-out' : 'hidden'"> + {{ pointsDialog }}</span>
+  <div class="game" v-if="gameState === 'playing'">
+    <div class="scores">
+      <div>
+        Score: <span class="accent">{{ score }}</span>
+        <span :class="showPointsDialog ? 'fade-slide-out' : 'hidden'"> + {{ pointsDialog }}</span>
+      </div>
+      <div>
+        Moves: <span class="accent">{{ moves }} / {{ movesLimit }}</span>
+      </div>
     </div>
-    <div>
-      Moves: <span class="accent">{{ moves }} / {{ movesLimit }}</span>
-    </div>
-  </div>
-  <div v-else>
-    <h2>Game Over</h2>
-    <p class="accent">you score was {{ score }}</p>
-    <button @click="resetGame">Play Again</button>
-  </div>
-  <div class="game-board">
-    <div class="letter-board">
-      <div v-for="(row, rowIndex) in board" :key="`row-${rowIndex}`" class="game-row">
-        <div
-          v-for="(cell, cellIndex) in row"
-          :key="`cell-${cellIndex}`"
-          class="game-cell"
-          :class="{ selected: cell.selected, matched: cell.matched, fell: cell.fell }"
-          @click="() => handleCellClick(rowIndex, cellIndex)"
-        >
-          {{ cell.letter }}
+    <div class="game-board">
+      <div class="letter-board">
+        <div v-for="(row, rowIndex) in board" :key="`row-${rowIndex}`" class="game-row">
+          <div v-for="(cell, cellIndex) in row" :key="`cell-${cellIndex}`" class="game-cell"
+            :class="{ selected: cell.selected, matched: cell.matched, fell: cell.fell }"
+            @click="() => handleCellClick(rowIndex, cellIndex)">
+            {{ cell.letter }}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="secret-word">
-      <div
-        class="game-cell"
-        v-for="(letter, index) in secretWord"
-        :key="`letter-${index}`"
-        :class="{ matched: currentLetters.includes(letter) }"
-      >
-        <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
+      <div class="secret-word">
+        <div class="game-cell" v-for="(letter, index) in secretWord" :key="`letter-${index}`"
+          :class="{ matched: currentLetters.includes(letter) }">
+          <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
+        </div>
+        <div class="score-multiplier">x {{ scoreMultiplier }}</div>
       </div>
-      <div class="score-multiplier">x {{ scoreMultiplier }}</div>
     </div>
+    <div class="got-words">
+      <template v-for="(word, i) in gotWords" :key="word">
+        <div class="tag" v-if="i > gotWords.length - 10 ">{{ word }}</div><span v-if="i == gotWords.length - 1 && i > 10">...</span>
+      </template>
+    </div>
+  </div>
+  <div class="game-over" v-else :class="gameState == 'over' ? 'fade-in' : ''">
+    <h2>Game Over</h2>
+    <p>you score was {{ score }}</p>
+    <button @click="resetGame">Play Again</button>
   </div>
   <div v-if="showDebug" class="debug">
     <pre>debug window</pre>
@@ -233,14 +232,16 @@ const checkSecretWord = () => {
   }
 
   if (secretLetters.every((letter) => currentLetters.value.includes(letter))) {
+    canClick.value = false
     currentLetters.value = []
     increaseScore(scoreMultiplier.value)
     scoreMultiplier.value != scoreMultiplierLimit
       ? (scoreMultiplier.value += scoreMultiplierIncrement)
       : scoreMultiplierLimit
     setTimeout(() => {
+      canClick.value = true;
       getSecretWord()
-    }, delayAmount)
+    }, delayAmount);
   } else {
     if (scoreMultiplier.value > 1) {
       scoreMultiplier.value -= 1
@@ -258,8 +259,19 @@ const increaseScore = (x) => {
 }
 
 const gameIsOver = () => {
-  let key = `bewordled-high-score-${new Date().toISOString()}`
-  localStorage.setItem(key, score.value)
+  const newKey = `bewordled-high-score-${new Date().toISOString()}`
+  if (localStorage.length >= 5) {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key.includes('bewordled')) {
+        score.value > Number(localStorage.getItem(key))
+          ? localStorage.removeItem(key) && localStorage.setItem(newKey, score.value)
+          : null
+        return
+      }
+    }
+  }
+
   canClick.value = false
   gameState.value = 'over'
 }
@@ -279,27 +291,65 @@ onMounted(initBoard)
 </script>
 
 <style>
+.game {}
+
+.game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 2rem;
+  animation: fade-in 1s ease forwards;
+  text-align: center;
+}
+
+.game-over h2 {
+  color: var(--color-accent);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 3rem;
+  margin-bottom: 1rem;
+}
+
+.game-over p {
+  margin-bottom: 1rem;
+}
+
+.got-words {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
 .letter-board {
   display: flex;
   flex-direction: column;
   margin: 20px auto;
   overflow: hidden;
 }
+
 .secret-word {
   display: flex;
   flex-direction: row;
   margin: 20px auto;
   align-items: center;
 }
+
 .secret-word div {
   margin: 5px;
 }
+
 .secret-word div:first-child {
   margin-left: 0;
 }
+
 .secret-word div:last-child {
   margin-right: 0;
 }
+
 .game-row {
   display: flex;
 }
@@ -316,21 +366,26 @@ onMounted(initBoard)
   position: relative;
   font-weight: 900;
 }
+
 .game-cell.selected {
   color: white;
   background-color: red;
 }
+
 .game-cell.matched {
   color: white;
   background-color: var(--color-accent);
 }
+
 .letter-board .game-cell {
   transform: translateY(-40px);
 }
+
 .game-cell.fell {
   transition: all 0.3s ease;
   transform: translateY(0);
 }
+
 .debug {
   position: fixed;
   margin: 2rem;
@@ -344,13 +399,22 @@ onMounted(initBoard)
   background-color: var(--color-accent);
   transition: all 0.3s ease;
 }
+
 .score-multiplier {
   color: var(--color-accent);
   font-weight: 900;
 }
+
 .accent {
   color: var(--color-accent);
   font-weight: 900;
+}
+
+.tag {
+  background-color: var(--color-accent);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
 }
 
 @keyframes fadeSlideOut {
@@ -358,17 +422,32 @@ onMounted(initBoard)
     opacity: 0;
     transform: translateY(10px);
   }
+
   50% {
     opacity: 1;
     transform: translateY(0px);
   }
+
   75% {
     opacity: 1;
     transform: translateY(0px);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -377,6 +456,11 @@ onMounted(initBoard)
   position: absolute;
   animation: fadeSlideOut 1s ease forwards;
 }
+
+.fade-in {
+  animation: fade-in 1s ease forwards;
+}
+
 .hidden {
   display: none;
 }
