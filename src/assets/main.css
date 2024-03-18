@@ -59,6 +59,7 @@ button {
 
   #app {
     padding: 0;
-    width: auto;
+    margin: auto;
+    max-width: 50%;
   }
 }

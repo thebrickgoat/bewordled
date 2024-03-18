@@ -52,7 +52,7 @@
 import { wordlist } from '@/assets/words'
 import { ref, onMounted, nextTick } from 'vue'
 
-const boardSize = 8
+const boardSize = 6
 const letters = ref([])
 // const vowels = ['a', 'e', 'i', 'o', 'u']
 const board = ref([])
@@ -69,7 +69,7 @@ const scoreMultiplierLimit = 100
 const scoreMultiplierIncrement = 10
 const canClick = ref(true)
 const gotWords = ref([])
-const showDebug = ref(true)
+const showDebug = ref(false)
 const pointsDialog = ref(0)
 const showPointsDialog = ref(false)
 

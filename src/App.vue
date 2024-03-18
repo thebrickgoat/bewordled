@@ -7,7 +7,8 @@ import HighScores from './components/HighScores.vue'
   <header>
     <div>
       <h1>bewordled</h1>
-      <p>wordle and bejeweled put together. whats not to love?</p>
+      <h2>wordle and bejeweled put together. whats not to love?</h2>
+      <p>instructions: click a letter and then click another letter in the square up, down, left or right of it to swap letters and make words 3 to 5 letters long to earn points. Longer words are worth more points. When you get a word, any letters in that word that are in the secert word will fill in, and if you complete the secert word you will gain points equal to a 5 letter word times the multiplier. The multipler will decrese with every move until the secert word is found, and increse by 10 for every secert word found. </p>
     </div>
   </header>
   <main>
