@@ -23,8 +23,8 @@
           to swap letters and make words 3 to 5 letters long to earn points. Longer words are worth
           more points. When you get a word, any letters in that word that are in the secret word
           will fill in, and if you complete the secret word you will gain points equal to a 5 letter
-          word times the multiplier. The multipler will decrese with every match until the secret
-          word is found, and increse by 10 for every secret word found.
+          word times the multiplier. The multipler will decrease with every match until the secret
+          word is found, and will increase by 10 for every secret word found.
         </p>
         <button @click="showPopup = false">Close</button>
       </div>

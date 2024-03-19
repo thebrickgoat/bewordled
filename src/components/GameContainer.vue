@@ -41,6 +41,12 @@
         <span v-if="i == gotWords.length - 1 && i > 10">...</span>
       </template>
     </div>
+    <div class="got-words">
+      <template v-for="(word, i) in gotSecretWords" :key="word">
+        <div class="tag" v-if="i > gotSecretWords.length - 10">{{ word }}</div>
+        <span v-if="i == gotSecretWords.length - 1 && i > 10">...</span>
+      </template>
+    </div>
   </div>
   <div class="game-over" v-else :class="gameState == 'over' ? 'fade-in' : ''">
     <h2>Game Over</h2>
@@ -70,6 +76,7 @@ const scoreMultiplierLimit = 100
 const scoreMultiplierIncrement = 10
 const canClick = ref(true)
 const gotWords = ref([])
+const gotSecretWords = ref([])
 const pointsDialog = ref(0)
 const showPointsDialog = ref(false)
 
@@ -237,9 +244,10 @@ const checkSecretWord = () => {
     scoreMultiplier.value != scoreMultiplierLimit
       ? (scoreMultiplier.value += scoreMultiplierIncrement)
       : scoreMultiplierLimit
+    gotSecretWords.value.push(secretWord.value)
     setTimeout(() => {
-      canClick.value = true
       currentLetters.value = []
+      canClick.value = true
       getSecretWord()
     }, delayAmount)
   } else {
@@ -270,6 +278,7 @@ const resetGame = () => {
   currentLetters.value = []
   canClick.value = true
   gotWords.value = []
+  gotSecretWords.value = []
   score.value = 0
   moves.value = 0
   scoreMultiplier.value = 10
