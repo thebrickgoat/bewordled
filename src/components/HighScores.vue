@@ -2,20 +2,16 @@
   <div>
     <div class="score-container">
       <h3>Local High Scores</h3>
-      <template v-if="localHighScores.length > 0">
-        <ul>
-          <li v-for="(score, index) in localHighScores" :key="score.id">
-            <span>{{ index + 1 }}</span> : <span class="accent">{{ score }}</span>
-          </li>
-        </ul>
-        <div class="button-container">
-          <button @click="clearScores">Clear Scores</button>
-          <button @click="showPopup = true">How To Play</button>
-        </div>
-      </template>
-      <template v-else>
-        <p>no scores yet!</p>
-      </template>
+      <ul v-if="localHighScores.length > 0">
+        <li v-for="(score, index) in localHighScores" :key="score.id">
+          <span>{{ index + 1 }}</span> : <span class="accent">{{ score }}</span>
+        </li>
+      </ul>
+      <p v-else>no scores yet!</p>
+      <div class="button-container">
+        <button v-if="localHighScores > 0" @click="clearScores">Clear Scores</button>
+        <button @click="showPopup = true">How To Play</button>
+      </div>
     </div>
   </div>
   <Transition name="fade">
@@ -145,7 +141,9 @@ ul {
   list-style: none;
   padding: 0;
 }
-
+p {
+  margin-bottom: 10px;
+}
 li {
   margin: 0.5rem 0;
 }
