@@ -8,7 +8,6 @@ import HighScores from './components/HighScores.vue'
     <div>
       <h1>bewordled</h1>
       <h2>wordle and bejeweled put together. whats not to love?</h2>
-
     </div>
   </header>
   <main>

@@ -12,7 +12,6 @@
           <button @click="clearScores">Clear Scores</button>
           <button @click="showPopup = true">How To Play</button>
         </div>
-
       </template>
       <template v-else>
         <p>no scores yet!</p>
@@ -20,17 +19,16 @@
     </div>
   </div>
   <Transition name="fade">
-
     <div class="popup" v-if="showPopup">
       <div class="popup-content">
         <h2>How To Play</h2>
         <p>
-          click a letter and then click another letter in the square up, down, left or
-          right of it to swap letters and make words 3 to 5 letters long to earn points. Longer words
-          are worth more points. When you get a word, any letters in that word that are in the secret
-          word will fill in, and if you complete the secret word you will gain points equal to a 5
-          letter word times the multiplier. The multipler will decrese with every match until the
-          secret word is found, and increse by 10 for every secret word found.
+          click a letter and then click another letter in the square up, down, left or right of it
+          to swap letters and make words 3 to 5 letters long to earn points. Longer words are worth
+          more points. When you get a word, any letters in that word that are in the secret word
+          will fill in, and if you complete the secret word you will gain points equal to a 5 letter
+          word times the multiplier. The multipler will decrese with every match until the secret
+          word is found, and increse by 10 for every secret word found.
         </p>
         <button @click="showPopup = false">Close</button>
       </div>
@@ -74,12 +72,12 @@ const deleteOtherScores = (scores) => {
 }
 
 const clearScores = () => {
-  localHighScores.value = []
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
     if (key.includes('bewordled')) {
       localStorage.removeItem(key)
     }
+    localHighScores.value = []
   }
 }
 
@@ -99,7 +97,6 @@ onMounted(() => {
   align-items: center;
   gap: 1rem;
   width: fit-content;
-
 }
 
 .popup {
@@ -123,7 +120,7 @@ onMounted(() => {
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   overflow: auto;
   width: auto;
-  margin: auto 2rem ;
+  margin: auto 2rem;
 }
 
 @media (min-width: 1024px) {

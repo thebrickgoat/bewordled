@@ -12,16 +12,24 @@
     <div class="game-board">
       <div class="letter-board">
         <div v-for="(row, rowIndex) in board" :key="`row-${rowIndex}`" class="game-row">
-          <div v-for="(cell, cellIndex) in row" :key="`cell-${cellIndex}`" class="game-cell"
+          <div
+            v-for="(cell, cellIndex) in row"
+            :key="`cell-${cellIndex}`"
+            class="game-cell"
             :class="{ selected: cell.selected, matched: cell.matched, fell: cell.fell }"
-            @click="() => handleCellClick(rowIndex, cellIndex)">
+            @click="() => handleCellClick(rowIndex, cellIndex)"
+          >
             {{ cell.letter }}
           </div>
         </div>
       </div>
       <div class="secret-word">
-        <div class="game-cell" v-for="(letter, index) in secretWord" :key="`letter-${index}`"
-          :class="{ matched: currentLetters.includes(letter), solved: currentLetters.length >= 5 }">
+        <div
+          class="game-cell"
+          v-for="(letter, index) in secretWord"
+          :key="`letter-${index}`"
+          :class="{ matched: currentLetters.includes(letter), solved: currentLetters.length >= 5 }"
+        >
           <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
         </div>
         <div class="score-multiplier">x {{ scoreMultiplier }}</div>
@@ -29,7 +37,8 @@
     </div>
     <div class="got-words">
       <template v-for="(word, i) in gotWords" :key="word">
-        <div class="tag" v-if="i > gotWords.length - 10 ">{{ word }}</div><span v-if="i == gotWords.length - 1 && i > 10">...</span>
+        <div class="tag" v-if="i > gotWords.length - 10">{{ word }}</div>
+        <span v-if="i == gotWords.length - 1 && i > 10">...</span>
       </template>
     </div>
   </div>
@@ -51,7 +60,7 @@ const board = ref([])
 const score = ref(0)
 const secretWord = ref('')
 const moves = ref(0)
-const movesLimit = 2
+const movesLimit = 50
 const gameState = ref('playing')
 const lastWord = ref('')
 const delayAmount = 1500
@@ -229,10 +238,10 @@ const checkSecretWord = () => {
       ? (scoreMultiplier.value += scoreMultiplierIncrement)
       : scoreMultiplierLimit
     setTimeout(() => {
-      canClick.value = true;
+      canClick.value = true
       currentLetters.value = []
       getSecretWord()
-    }, delayAmount);
+    }, delayAmount)
   } else {
     if (scoreMultiplier.value > 1) {
       scoreMultiplier.value -= 1
@@ -271,7 +280,8 @@ onMounted(initBoard)
 </script>
 
 <style>
-.game {}
+.game {
+}
 
 .game-over {
   display: flex;
@@ -432,13 +442,13 @@ onMounted(initBoard)
 }
 @keyframes blink {
   0% {
-    opacity: .5;
+    opacity: 0.5;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 .fade-slide-out {
@@ -451,8 +461,8 @@ onMounted(initBoard)
   animation: fade-in 1s ease forwards;
 }
 
-.solved{
-  animation: blink .5s ease forwards infinite;
+.solved {
+  animation: blink 0.5s ease forwards infinite;
 }
 .hidden {
   display: none;

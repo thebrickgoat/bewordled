@@ -59,11 +59,10 @@ button {
     display: flex;
     place-items: center;
   }
-  .half{
+  .half {
     max-width: 50%;
-  
   }
-  main{
+  main {
     max-width: 695px;
   }
   #app {
