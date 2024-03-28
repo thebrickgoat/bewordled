@@ -12,24 +12,16 @@
     <div class="game-board">
       <div class="letter-board">
         <div v-for="(row, rowIndex) in board" :key="`row-${rowIndex}`" class="game-row">
-          <div
-            v-for="(cell, cellIndex) in row"
-            :key="`cell-${cellIndex}`"
-            class="game-cell"
+          <div v-for="(cell, cellIndex) in row" :key="`cell-${cellIndex}`" class="game-cell"
             :class="{ selected: cell.selected, matched: cell.matched, fell: cell.fell }"
-            @click="() => handleCellClick(rowIndex, cellIndex)"
-          >
+            @click="() => handleCellClick(rowIndex, cellIndex)">
             {{ cell.letter }}
           </div>
         </div>
       </div>
       <div class="secret-word">
-        <div
-          class="game-cell"
-          v-for="(letter, index) in secretWord"
-          :key="`letter-${index}`"
-          :class="{ matched: currentLetters.includes(letter), solved: currentLetters.length >= 5 }"
-        >
+        <div class="game-cell" v-for="(letter, index) in secretWord" :key="`letter-${index}`"
+          :class="{ matched: currentLetters.includes(letter), solved: currentLetters.length >= 5 }">
           <template v-if="letter && currentLetters.includes(letter)">{{ letter }}</template>
         </div>
         <div class="score-multiplier">x {{ scoreMultiplier }}</div>
@@ -85,8 +77,15 @@ const initBoard = () => {
   letters.value = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))
   for (let i = 0; i < boardSize; i++) {
     board.value[i] = []
+    let count = 0
     for (let j = 0; j < boardSize; j++) {
-      board.value[i][j] = createCell()
+      if (count >= 3) {
+        board.value[i][j] = createVowelCell()
+        count = 0
+      } else {
+        board.value[i][j] = createCell()
+        count++;
+      }
     }
   }
   updateCellStatus()
@@ -191,17 +190,24 @@ const removeMatches = (points) => {
   increaseScore(points)
   // Introduce a small delay before clearing matches and refilling
   setTimeout(() => {
+    let count = 0;
     for (let i = 0; i < boardSize; i++) {
       for (let j = 0; j < boardSize; j++) {
         if (board.value[i][j].matched) {
           for (let k = i; k > 0; k--) {
             board.value[k][j] = board.value[k - 1][j]
           }
-          board.value[0][j] = createCell()
+          if (count >= 3) {
+            board.value[0][j] = createVowelCell();
+            count++;
+          } else {
+            board.value[0][j] = createCell();
+          }
         }
       }
     }
-    canClick.value = true
+
+    canClick.value = true;
 
     // Recursively check for new matces after the board has been updated
     checkForMatches()
@@ -289,8 +295,7 @@ onMounted(initBoard)
 </script>
 
 <style>
-.game {
-}
+.game {}
 
 .game-over {
   display: flex;
@@ -449,17 +454,21 @@ onMounted(initBoard)
     transform: translateY(0);
   }
 }
+
 @keyframes blink {
   0% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.5;
   }
 }
+
 .fade-slide-out {
   margin-left: 0.25rem;
   position: absolute;
@@ -473,6 +482,7 @@ onMounted(initBoard)
 .solved {
   animation: blink 0.5s ease forwards infinite;
 }
+
 .hidden {
   display: none;
 }
